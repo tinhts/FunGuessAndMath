@@ -20,8 +20,6 @@ bool debug_mode = false; // This is hard coded to false but can change from comm
 // --- The secret number
 int secret_num;
 
-
-
 /* ------------------------------------------------
 Check to see if $ARG is a Prime number
 	Input: An Interger
@@ -35,6 +33,37 @@ bool is_prime(int X)
 		if (X % i == 0)
 			return false;
 	return true;
+}
+
+/* This same as cin but also checks to make sure the input is an integer only. It also accepts a string to display to user. So the class can be reused
+*/
+int input_integer(char passed_message[])
+{
+	int num;
+	//bool valid = false;
+	do
+	{
+		//valid = true; // Assume the cin will be an integer.
+		//cout << "Enter an integer value: ";
+		
+		//if(cin.fail()) // Checks to see if the value in the cin stream is the correct type, if not it returns true, false otherwise
+		//{//
+			cout << passed_message;
+			cin >> num;
+			if(!cin.fail()) {
+				return num;
+			}
+			cin.clear(); // This corrects the stream.
+			cin.ignore(999,'\n' ); // This skips the left over stream data.
+			//valid = false; // The cin was not an integer so try again
+		//}//
+		//cout << "You entered: " << str(num) << endl;
+		//system("PAUSE");
+		//return num;
+		
+	}
+	while (!cin.fail());
+	//return num;
 }
 
 /* ----------------------------------------------------------
@@ -103,8 +132,9 @@ void x_game(int X)
 {
 	int user_num, x_num;
 	cout << "Think of an X number that is the closet bigger than the secret number and is a product of " << prime_divisors << " prime factors \n";
-    cout << "Prove your best math. Put in the X NUMBER: ";        		
-    cin >> user_num;
+	cout << "Prove your best math, put in the X NUMBER" << endl;
+	char input_message[] = "INTERGER ONLY please: ";
+    user_num = input_integer(input_message);
     x_num = find_x(X+1); // Call find_x follow the instructions from the project is X must be bigger than secret number
 	if (user_num != x_num)
 	{
@@ -119,34 +149,6 @@ void x_game(int X)
 	
 }
 
-int input_integer()
-{
-	int num;
-	//bool valid = false;
-	do
-	{
-		//valid = true; // Assume the cin will be an integer.
-		//cout << "Enter an integer value: ";
-		
-		//if(cin.fail()) // Checks to see if the value in the cin stream is the correct type, if not it returns true, false otherwise
-		//{//
-			cout << "Please enter an integer only: ";
-			cin >> num;
-			if(!cin.fail()) {
-				return num;
-			}
-			cin.clear(); // This corrects the stream.
-			cin.ignore(); // This skips the left over stream data.
-			//valid = false; // The cin was not an integer so try again
-		//}//
-		//cout << "You entered: " << str(num) << endl;
-		//system("PAUSE");
-		//return num;
-		
-	}
-	while (!cin.fail());
-	//return num;
-}
 
 /* ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 This is the body of the 1st game. Allow user to guess the secret number. X is the secret number passed to the function. guess_num is internal variable, only for users to put in guessed numbers
@@ -155,12 +157,11 @@ This function return TRUE if the guess is correct, otherwise returns false
 bool guess_master()
 {
 	cout << "Let's play a game shall we? \n";
-    cout << "I'll think of a number from " << min_guess_num << " to " << max_guess_num << "\n";
-    cout << "You will have " << max_guess_times << " tries to guess \n";
-    cout << "Now I'll choose the cecret number. You are NOT allowed to see my screen.\n";
-    cout << "Input the secret number. Enter 0 and the number will be choosen randomly: ";
+    cout << "Now I'll choose a cecret number. You are NOT allowed to see my screen.\n";
+    cout << "I'll input the secret number. Enter 0 and the number will be choosen randomly" << endl;
+    char input_message[] = "Please input an integer ONLY: ";
     int secret_overide = 0;
-    cin >> secret_overide;
+    secret_overide = input_integer(input_message);
     if (secret_overide != 0)
     	secret_num = secret_overide;
     else 
@@ -168,14 +169,16 @@ bool guess_master()
 		srand(time(0));
 		secret_num = rand() % max_guess_num + 0;
 	}
-    
-    
+
+    cout << "You'll need to guess a number from " << min_guess_num << " to " << max_guess_num << "\n";
+    cout << "You will have " << max_guess_times << " tries to guess\n"; 
+	char input_message_1[] = "Input an integer ONLY, please: ";	 
     int guess_num, tries=0;
 	do 
 	{
         //cout << "Please guess: ";    	
         //cin >> guess_num;
-        guess_num = input_integer(); // Call to make sure a valid integer is provided
+        guess_num = input_integer(input_message_1); // Call to make sure a valid integer is provided
        	tries++;
         if (guess_num < secret_num)	
         	cout << "Your guess is less, than the secret number. Try again.\n";
@@ -202,8 +205,7 @@ void guess_game()
 	{
 		cout << "You have proven to be a GUESS MASTER.\n";
 	}		
-	cout << "The secret number is: " << secret_num << "\n";
-	cout << "Now, move on to the next game shall we? \n\n";	
+	cout << "The secret number is: " << secret_num << "\n";	
 }
 
 /* ------------------------------------------------
@@ -231,10 +233,10 @@ int main(int argc, char** argv)
 
     // 1st Game
     guess_game();
-    
+	cout << "Now, move on to the next game shall we? \n\n";
+	
 	// 2nd Game
 	x_game(secret_num);
 	system("PAUSE");	// This to pause the console and let user to see things. Without this the console will exist if program is launched directly, not from a parent console
 	return 0;
 }
-
