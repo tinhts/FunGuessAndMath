@@ -1,0 +1,2 @@
+# FunGuessAndMath
+my first repo
