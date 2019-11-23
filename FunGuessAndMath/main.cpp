@@ -225,7 +225,7 @@ int main(int argc, char** argv)
 		prime_divisors = atoi(argv[4]);
 	} else if (argc!=1)
 	{
-		cout << "FunGuess accepts no arguments or 4 arguments only !!";
+		cout << "TEST -FunGuess accepts no arguments or 4 arguments only !!";
 		return 0;
 	}
 
