@@ -1,6 +1,7 @@
 #include <cstdlib>
 #include <time.h>
 #include <iostream>
+#include <fstream>
 using namespace std;
 
 /* ------------------------------------------------
@@ -15,7 +16,10 @@ int prime_divisors = 3;   //
 //int X_array[prime_divisors];			// Array to store found devisors
 int X_array[10];			// Array to store found devisors
 
-bool debug_mode = false; // This is hard coded to false but can change from command line or config file. If true, debug outputs will be to log file
+// This is hard coded to false but can change from command line or config file. If true, debug outputs will be to log file
+bool log_on = false; 
+ofstream log_file;
+char log_file_name[] = "log.txt";
 
 // --- The secret number
 int secret_num;
@@ -80,8 +84,7 @@ long int find_x(int X)
 	{
 		count = 0;	
 		X_num = 1;
-		// Uncommented below line for debuding purpose: 
-		//cout << "Secret Num = " << X << ":\n";
+		if (log_file.is_open()) log_file << "Secret Num = " << X << ":\n";
 		// This For loop finds all primes who are sub-divisions of X. With each found it will count 1 and also muultiplies the founds together to accumulate X_num
 		for (int i = 2; i < X; i++)
 		{
@@ -89,14 +92,12 @@ long int find_x(int X)
 			{
 				X_array[count] = i;
 				count++;
-				X_num = X_num*i;	
-				// Uncommented below line for debuding purpose: 
-				//cout << "Devisor = " << i << " | count = "<< count << " | X_num = " << X_num << "\n";
+				X_num = X_num*i;	 
+				if (log_file.is_open()) log_file << "Devisor = " << i << " | count = "<< count << " | X_num = " << X_num << "\n";
 				
 			} else
 			{
-				// Uncommented below line for debuding purpose: 
-				//cout << "Devisor = " << i << " | count = "<< count << " | X_num = " << X_num << "\n";
+				if (log_file.is_open()) log_file << "Devisor = " << i << " | count = "<< count << " | X_num = " << X_num << "\n";
 			}
 		}
 		// This IF checks for conditions to exit the while loop. It will set not_found to false if found 2 primes & X_num == X. Otherwise, X is increase 1 and the DO-WHILE continues
@@ -107,9 +108,8 @@ long int find_x(int X)
 			X++;
 		}	
 	}
-	while (not_found);
-	// Uncommented below line for debuding purpose: 
-	//cout << "DONE!!! - X_num = " << X_num << " " << "count = " << count << "X = " << X << "\n";
+	while (not_found); 
+	if (log_file.is_open()) log_file << "DONE!!! - X_num = " << X_num << " " << "count = " << count << "X = " << X << "\n";
 	return X;
 }
 
@@ -154,7 +154,7 @@ void x_game(int X)
 This is the body of the 1st game. Allow user to guess the secret number. X is the secret number passed to the function. guess_num is internal variable, only for users to put in guessed numbers
 This function return TRUE if the guess is correct, otherwise returns false
 ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
-bool guess_master()
+void guess_game()
 {
 	cout << "Let's play a game shall we? \n";
     cout << "Now I'll choose a cecret number. You are NOT allowed to see my screen.\n";
@@ -174,6 +174,8 @@ bool guess_master()
     cout << "You will have " << max_guess_times << " tries to guess\n"; 
 	char input_message_1[] = "Input an integer ONLY, please: ";	 
     int guess_num, tries=0;
+    bool correct_guess = 0;
+    // 3 times guess. If the guess is correct before 3 times. the loop will break and return true to correct_guess
 	do 
 	{
         //cout << "Please guess: ";    	
@@ -186,27 +188,20 @@ bool guess_master()
         	cout << "Your guess is more than the secret number. Try again.\n";
         else
         {		
-            return true;									// The return will break the function
+            //return true;
+			correct_guess = true;									// The return will break the function
+            break;
     	}
     }
 	while (tries < max_guess_times);
-	return false;
-}	
-
-/* THE FUN GUESS GAME -------------
-	This calls guess_master()
-*/
-void guess_game()
-{
-	if (guess_master()!=true) 
-	{   	
-		cout << "\nYou failed after " << max_guess_times << " times." << endl;		
-	} else 
+	// Check if the guess is correct or NOT
+	if (correct_guess)
 	{
 		cout << "You have proven to be a GUESS MASTER.\n";
-	}		
-	cout << "The secret number is: " << secret_num << "\n";	
-}
+	} else cout << "\nYou failed after " << max_guess_times << " times." << endl;
+		
+	cout << "The secret number is: " << secret_num << "\n";
+}	
 
 /* ------------------------------------------------
 MAIN starts here
@@ -219,24 +214,39 @@ int main(int argc, char** argv)
 	2nd agurment is max_guess_num
 	3 agurment is max_guess_times
 	----------------------------------------------------------------------------------------------*/
-	if (argc==5)				// For now, just simple check if number of arguments are 5 than get arguments from command line
+	if (argc==6)				// For now, just simple check if number of arguments are 6 than get arguments from command line
 	{
 		min_guess_num = atoi(argv[1]);
 		max_guess_num = atoi(argv[2]);
 		max_guess_times = atoi(argv[3]);
 		prime_divisors = atoi(argv[4]);
+		log_on = atoi(argv[5]);
 	} else if (argc!=1)
 	{
-		cout << "FunGuess accepts no arguments or 4 arguments only !!";
+		cout << "FunGuess accepts no arguments or 5 arguments only !!";
 		return 0;
 	}
 
+	// Check if log mode is on
+	if (log_on) 
+	{
+		log_file.open(log_file_name);
+		log_file << "Log Mode is ON. Logging to file..." << endl;
+	}
+	
     // 1st Game
     guess_game();
 	cout << "Now, move on to the next game shall we? \n\n";
 	
 	// 2nd Game
 	x_game(secret_num);
-	system("PAUSE");	// This to pause the console and let user to see things. Without this the console will exist if program is launched directly, not from a parent console
+	
+	if (log_file.is_open())
+	{
+		log_file.close();
+	}
+	// This to pause the console and let user to see things. 
+	//Without this the console will exist if program is launched directly, not from a parent console
+	system("PAUSE");	
 	return 0;
 }
