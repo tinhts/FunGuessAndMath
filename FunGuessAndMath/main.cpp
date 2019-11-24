@@ -75,6 +75,12 @@ The games that let user do their math to find the X number, input it, and the fu
 ---------------------------------------------------------------------------------------------------------------------------------------------*/
 long int x_game(int secret)
 {
+	// User Input block
+	int user_num;
+	cout << "Think of an X number that is the closet bigger than the secret number and is a product of " << prime_divisors << " prime factors \n";
+	cout << "Prove your best math, put in the X NUMBER" << endl;
+	char input_message[] = "INTERGER ONLY please: ";
+    user_num = input_integer(input_message);
 	
 	// Find X number block
 	int X = secret + 1;									// Increase X to 1 since the X number must be greater than the secret number
@@ -86,20 +92,28 @@ long int x_game(int secret)
 		X_num = 1;
 		if (log_file.is_open()) log_file << "Secret Num = " << X << ":\n";
 		// This For loop finds all primes who are sub-divisions of X. With each found it will count 1 and also muultiplies the founds together to accumulate X_num
-		for (int i = 2; i < X; i++)
+		int i = 2;
+		int tmp = X;
+		do
 		{
-			if (is_prime(i) && X % i == 0)
+			if (is_prime(i) && tmp % i == 0) 
 			{
 				X_array[count] = i;
 				count++;
-				X_num = X_num*i;	 
-				if (log_file.is_open()) log_file << "Devisor = " << i << " | count = "<< count << " | X_num = " << X_num << "\n";
-				
+				X_num = X_num*i;
+				while (tmp%i == 0)
+				{
+					tmp = tmp/i;
+					//if (log_file.is_open()) log_file << "Devisor = " << i << " | count = "<< count << " | X_num = " << X_num << " | tmp = " << tmp << endl;
+				};
+				if (log_file.is_open()) log_file << "Devisor = " << i << " | count = "<< count << " | X_num = " << X_num << " | tmp = " << tmp << endl;
 			} else
 			{
-				if (log_file.is_open()) log_file << "Devisor = " << i << " | count = "<< count << " | X_num = " << X_num << "\n";
+				if (log_file.is_open()) log_file << "Devisor = " << i << " | count = "<< count << " | X_num = " << X_num << " | tmp = " << tmp << endl;
 			}
-		}
+			i++;
+		} while (tmp!=1);
+		
 		// This IF checks for conditions to exit the while loop. It will set not_found to false if found 2 primes & X_num == X. Otherwise, X is increase 1 and the DO-WHILE continues
 		if (count==prime_divisors && X_num == X) 
 		{ 
@@ -111,13 +125,6 @@ long int x_game(int secret)
 	while (not_found); 
 	if (log_file.is_open()) log_file << "DONE!!! - X_num = " << X_num << " " << "count = " << count << "X = " << X << "\n";
 	//X number already found and stored in X_num
-	
-	// User Input block
-	int user_num;
-	cout << "Think of an X number that is the closet bigger than the secret number and is a product of " << prime_divisors << " prime factors \n";
-	cout << "Prove your best math, put in the X NUMBER" << endl;
-	char input_message[] = "INTERGER ONLY please: ";
-    user_num = input_integer(input_message);
 	
 	// Compare the found X_num with user input
 	if (user_num != X_num)
