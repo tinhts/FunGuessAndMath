@@ -13,8 +13,6 @@ int max_guess_num = 50; // Upper limit of guess number
 int max_guess_times = 5; // Max times to try
 int prime_divisors = 3;   // 
 //
-//int X_array[prime_divisors];			// Array to store found devisors
-int X_array[10];			// Array to store found devisors
 
 // This is hard coded to false but can change from command line or config file. If true, debug outputs will be to log file
 bool log_on = false; 
@@ -44,14 +42,8 @@ bool is_prime(int X)
 int input_integer(char passed_message[])
 {
 	int num;
-	//bool valid = false;
 	do
 	{
-		//valid = true; // Assume the cin will be an integer.
-		//cout << "Enter an integer value: ";
-		
-		//if(cin.fail()) // Checks to see if the value in the cin stream is the correct type, if not it returns true, false otherwise
-		//{//
 			cout << passed_message;
 			cin >> num;
 			if(!cin.fail()) {
@@ -59,26 +51,34 @@ int input_integer(char passed_message[])
 			}
 			cin.clear(); // This corrects the stream.
 			cin.ignore(999,'\n' ); // This skips the left over stream data.
-			//valid = false; // The cin was not an integer so try again
-		//}//
-		//cout << "You entered: " << str(num) << endl;
-		//system("PAUSE");
-		//return num;
-		
 	}
 	while (!cin.fail());
-	//return num;
 }
 
-/* ----------------------------------------------------------
-Find X number
-	Input: Secret number is an interger 
-	Return: Found X number. Is a multiple of 2 prime numbers
------------------------------------------------------------*/
-long int find_x(int X)
+/* This take an array of found prime divisors and display them*/
+void display_X(int *array, int length)
 {
-	int count;
-	int X_num;
+	for (int i = 0; i <= length-1; i++)
+	{
+		if (i==prime_divisors-1)
+		{
+			cout << array[i] << "\n";
+		} else 
+			cout << array[i] << " X ";
+	}
+}
+
+/* --------------------------------------------------------------------------------------------------------------------------------------------------------
+The games that let user do their math to find the X number, input it, and the function will copare with the found X number returned from find_x() function
+	Input: Secret number  is an interger 
+	Return: Found X number. Is a multiple of 2 prime numbers
+---------------------------------------------------------------------------------------------------------------------------------------------*/
+long int x_game(int secret)
+{
+	
+	// Find X number block
+	int X = secret + 1;									// Increase X to 1 since the X number must be greater than the secret number
+	int count, X_num, X_array[20];			// X_array to store found divisors
 	bool not_found=true;
 	do 
 	{
@@ -110,45 +110,27 @@ long int find_x(int X)
 	}
 	while (not_found); 
 	if (log_file.is_open()) log_file << "DONE!!! - X_num = " << X_num << " " << "count = " << count << "X = " << X << "\n";
-	return X;
-}
-
-void display_X()
-{
-	for (int i = 0; i <= prime_divisors-1; i++)
-	{
-		if (i==prime_divisors-1)
-		{
-			cout << X_array[i] << "\n";
-		} else 
-			cout << X_array[i] << " X ";
-	}
-}
-
-/* --------------------------------------------------------------------------------------------------------------------------------------------------------
-The games that let user do their math to find the X number, input it, and the function will copare with the found X number returned from find_x() function
-----------------------------------------------------------------------------------------------------------------------------------------------------------*/
-void x_game(int X)
-{
-	int user_num, x_num;
+	//X number already found and stored in X_num
+	
+	// User Input block
+	int user_num;
 	cout << "Think of an X number that is the closet bigger than the secret number and is a product of " << prime_divisors << " prime factors \n";
 	cout << "Prove your best math, put in the X NUMBER" << endl;
 	char input_message[] = "INTERGER ONLY please: ";
     user_num = input_integer(input_message);
-    x_num = find_x(X+1); // Call find_x follow the instructions from the project is X must be bigger than secret number
-	if (user_num != x_num)
+	
+	// Compare the found X_num with user input
+	if (user_num != X_num)
 	{
-		cout << "Wrong MATH !!!! Correct X number is: " << x_num << "\n" << "Which is equal to: ";
-		display_X();
+		cout << "Wrong MATH !!!! Correct X number is: " << X_num << "\n" << "Which is equal to: ";
+		display_X(X_array, prime_divisors);
 	}
 	else
 	{
-		cout << "Best MATH !!! You've found X number: " << x_num << "\n" << "Which is equal to: ";
-		display_X();
+		cout << "Best MATH !!! You've found X number: " << X_num << "\n" << "Which is equal to: ";
+		display_X(X_array, prime_divisors);
 	}
-	
 }
-
 
 /* ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 This is the body of the 1st game. Allow user to guess the secret number. X is the secret number passed to the function. guess_num is internal variable, only for users to put in guessed numbers
