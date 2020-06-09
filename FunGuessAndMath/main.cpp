@@ -4,7 +4,7 @@
 #include <fstream>
 using namespace std;
 
-/* ------------------------------------------------
+/* ----------------NEW-----------------------------
 Global variables declaration
 These variables are hard coded but can be set by command arguments or from config file
 -------------------------------------------------*/
